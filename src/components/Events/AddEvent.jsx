@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { createEvent } from '../../apis/EventApi';
 
 const validationSchema = Yup.object({
   eventName: Yup.string().required("Event Name is required"),
@@ -24,11 +25,10 @@ const validationSchema = Yup.object({
     .required("Image URL is required"),
   eventMode: Yup.string().required("Event Mode is required"),
   category: Yup.string().required("Category is required"),
-  subcategory: Yup.string().required("Subcategory is required"),
+  subcategory: Yup.string(),
   linkToRegister: Yup.string()
     .url("Enter a valid registration link")
     .required("Registration Link is required"),
-  status: Yup.boolean(),
 });
 
 export default function AddEventForm() {
@@ -39,7 +39,7 @@ export default function AddEventForm() {
     initialValues: {
       eventName: "",
       eventDescription: "",
-      eventDate: "2025-01-10",
+      eventDate: "",
       eventType: "",
       eventLocation: "",
       eventImage: "",
@@ -47,13 +47,16 @@ export default function AddEventForm() {
       category: "",
       subcategory: "",
       linkToRegister: "",
-      status: false,
     },
     validationSchema,
-    onSubmit: (values) => {
-      console.log("New Event Added:", values);
-      setAddSuccess(true);
-      setTimeout(() => navigate("/events"), 500);
+    onSubmit: async (values) => {
+      try {
+        await createEvent(values);
+        setAddSuccess(true);
+        setTimeout(() => navigate('/events'), 500);
+      } catch (error) {
+        console.error('Failed to add event:', error);
+      }
     },
   });
 

@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
@@ -22,37 +22,10 @@ import AddInterviewExperience from './components/InterviewExperience/AddIntervie
 import ViewEvent from './components/Events/ViewEvent';
 import ViewNews from './components/News/ViewNews';
 import ViewGallery from './components/Gallery/ViewGallery';
-
-const events = [
-  {
-    eventId: 1,
-    eventName: "Tech Conference 2024",
-    eventDescription: "A global tech conference with top industry leaders.",
-    eventDate: "2024-08-10",
-    eventType: "Technology",
-    eventLocation: "New York",
-    eventImage: "https://via.placeholder.com/50",
-    eventMode: "Offline",
-    category: "Tech",
-    subcategory: "AI & ML",
-    linkToRegister: "https://example.com/register",
-    status: true,
-  },
-  {
-    eventId: 2,
-    eventName: "Startup Meetup",
-    eventDescription: "Networking event for startup founders and investors.",
-    eventDate: "2024-08-10",
-    eventType: "Business",
-    eventLocation: "San Francisco",
-    eventImage: "https://via.placeholder.com/50",
-    eventMode: "Online",
-    category: "Entrepreneurship",
-    subcategory: "Startup Funding",
-    linkToRegister: "https://example.com/register",
-    status: false,
-  },
-];
+import AddJobPosting from './components/JobPostings/AddJobPosting';
+import EditJobPosting from './components/JobPostings/EditJobPosting';
+import ViewJobPosting from './components/JobPostings/ViewJobPosting';
+import { getAllEvents } from './apis/EventApi';
 
 const demoNews = [
   {
@@ -81,13 +54,64 @@ const demoNews = [
   },
 ];
 
+const jobPostingsData = [
+  {
+    jobsPostingId: 1,
+    jobTitle: "Software Engineer",
+    jobDescription: "Develop and maintain web applications.",
+    companyName: "TechCorp",
+    companyLocation: "San Francisco",
+    jobMode: "Remote",
+    jobType: "Full-time",
+    jobCategory: "Technical",
+    expectedSalary: "$100,000 - $120,000",
+    applyLink: "https://example.com/apply",
+    requiredSkills: "JavaScript, React, Node.js",
+    qualifications: "Bachelor's degree in Computer Science",
+    responsibilities: "Develop features, fix bugs, and write tests.",
+    createdAt: "2024-08-01T10:00:00Z",
+    updatedAt: "2024-08-05T15:00:00Z",
+  },
+  {
+    jobsPostingId: 2,
+    jobTitle: "Marketing Specialist",
+    jobDescription: "Plan and execute marketing campaigns.",
+    companyName: "Marketify",
+    companyLocation: "New York",
+    jobMode: "Onsite",
+    jobType: "Part-time",
+    jobCategory: "Non-Technical",
+    expectedSalary: "$50,000 - $60,000",
+    applyLink: "https://example.com/apply",
+    requiredSkills: "SEO, Content Marketing, Analytics",
+    qualifications: "Bachelor's degree in Marketing",
+    responsibilities: "Create campaigns, analyze performance, and optimize.",
+    createdAt: "2024-08-02T11:00:00Z",
+    updatedAt: "2024-08-06T16:00:00Z",
+  },
+];
+
 function App() {
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const data = await getAllEvents();
+        setEvents(data.items);
+      } catch (error) {
+        console.error('Failed to fetch events:', error);
+      }
+    };
+    fetchEvents();
+  }, []);
+
   return (
     <Fragment>
       <Router>
         <Header />
         <Routes>
-          <Route path='/' element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/events" element={<Events />} />
           <Route path="/editEvent/:id" element={<EditEventForm events={events} />} />
           <Route path="/viewEvent/:id" element={<ViewEvent events={events} />} />
@@ -105,6 +129,9 @@ function App() {
           <Route path='/viewInterviewExperience/:id' element={<ViewInterviewExperience />} />
           <Route path='/addInterviewExperience' element={<AddInterviewExperience />} />
           <Route path="/jobs" element={<JobPostings />} />
+          <Route path="/addJobPosting" element={<AddJobPosting />} />
+          <Route path="/editJobPosting/:id" element={<EditJobPosting jobPostings={jobPostingsData} />} />
+          <Route path="/viewJobPosting/:id" element={<ViewJobPosting jobPostings={jobPostingsData} />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/interview-experience" element={<InterviewExp />} />
         </Routes>

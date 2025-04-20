@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { createInterviewExperience } from '../../apis/InterviewExperienceApi';
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Title is required"),
@@ -40,10 +41,14 @@ export default function AddInterviewExperience() {
       anyTips: "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      console.log("New Interview Experience Added:", values);
-      setAddSuccess(true);
-      setTimeout(() => navigate("/interview-experience"), 500);
+    onSubmit: async (values) => {
+      try {
+        await createInterviewExperience(values);
+        setAddSuccess(true);
+        setTimeout(() => navigate('/interview-experience'), 500);
+      } catch (error) {
+        console.error('Failed to add interview experience:', error);
+      }
     },
   });
 

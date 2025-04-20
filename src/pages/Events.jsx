@@ -1,44 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import EventsTable from "../components/Events/EventsTable";
 import { drawerWidth } from "../components/Layout/Header";
-import { Box, Typography , Button} from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-
-
-// Sample data for events
-const eventData = [
-  {
-    eventId: 1,
-    eventName: "Tech Conference 2024",
-    eventDescription: "A global tech conference with top industry leaders.",
-    eventDate: "2024-10-15T10:00:00Z",
-    eventType: "Technology",
-    eventLocation: "New York",
-    eventImage: "https://via.placeholder.com/50",
-    eventMode: "Offline",
-    category: "Tech",
-    subcategory: "AI & ML",
-    linkToRegister: "https://example.com/register",
-    status: true,
-  },
-  {
-    eventId: 2,
-    eventName: "Startup Meetup",
-    eventDescription: "Networking event for startup founders and investors.",
-    eventDate: "2024-11-20T14:00:00Z",
-    eventType: "Business",
-    eventLocation: "San Francisco",
-    eventImage: "https://via.placeholder.com/50",
-    eventMode: "Online",
-    category: "Entrepreneurship",
-    subcategory: "Startup Funding",
-    linkToRegister: "https://example.com/register",
-    status: false,
-  },
-];
+import { getAllEvents } from "../apis/EventApi";
 
 const Events = () => {
+  const [eventData, setEventData] = useState([]); // Initialize as an empty array
+  const [error, setError] = useState(null); // Add error state
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const data = await getAllEvents();
+        setEventData(data.items || []); // Ensure data.items is an array
+        setError(null); // Clear error if successful
+      } catch (error) {
+        if (error.message === "Network Error") {
+          setError(
+            "Network error: Unable to connect to the server. Please check your internet connection."
+          );
+        } else if (error.response && error.response.status === 404) {
+          setError("No events found.");
+        } else {
+          setError("Failed to load events. Please try again later.");
+        }
+        console.error("Failed to fetch events:", error);
+      }
+    };
+    fetchEvents();
+  }, []);
+
   return (
     <Box
       component="main"
@@ -54,6 +47,11 @@ const Events = () => {
       <Typography variant="h4" sx={{ mb: 2 }}>
         Events
       </Typography>
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
       <Button
         variant="contained"
         color="primary"
@@ -62,7 +60,12 @@ const Events = () => {
       >
         Add New Event
       </Button>
-      <EventsTable data={eventData} />
+      <EventsTable
+        data={eventData}
+        onDelete={(id) =>
+          setEventData(eventData.filter((event) => event.eventId !== id))
+        }
+      />
     </Box>
   );
 };

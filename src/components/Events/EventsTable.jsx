@@ -7,12 +7,22 @@ import { Button, Paper, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { deleteEvent } from '../../apis/EventApi';
 
-const EventsTable = ({ data, onDelete }) => {
+const EventsTable = ({ data = [], onDelete }) => { // Default data to an empty array
   const navigate = useNavigate();
 
   const handleUpdate = (row) => {
     navigate(`/editEvent/${row?.eventId}`);
+  };
+
+  const handleDelete = async (eventId) => {
+    try {
+      await deleteEvent(eventId);
+      onDelete(eventId);
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
   };
 
   const handleRowClick = (row) => {
@@ -81,7 +91,7 @@ const EventsTable = ({ data, onDelete }) => {
               color="error"
               onClick={(e) => {
                 e.stopPropagation();
-                onDelete(row.original.eventId);
+                handleDelete(row.original.eventId);
               }}
             >
               <DeleteIcon />

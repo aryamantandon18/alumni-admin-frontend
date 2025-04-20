@@ -7,6 +7,7 @@ import { Paper, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { deleteNews } from "../../apis/NewsApi";
 
 export default function NewsTable({ data, onDelete }) {
   const navigate = useNavigate();
@@ -17,6 +18,15 @@ export default function NewsTable({ data, onDelete }) {
 
   const handleRowClick = (row) => {
     navigate(`/viewNews/${row.original.newsId}`);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteNews(id);
+      onDelete(id);
+    } catch (error) {
+      console.error("Failed to delete news:", error);
+    }
   };
 
   const columns = useMemo(
@@ -94,7 +104,7 @@ export default function NewsTable({ data, onDelete }) {
               color="error"
               onClick={(e) => {
                 e.stopPropagation();
-                onDelete(row.original.newsId);
+                handleDelete(row.original.newsId);
               }}
             >
               <DeleteIcon />

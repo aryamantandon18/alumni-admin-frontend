@@ -1,37 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import InterviewExperiencesTable from "../components/InterviewExperience/InterviewExperienceTable";
 import { drawerWidth } from "../components/Layout/Header";
 import { Box, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-
-// Sample data for interview experiences
-const interviewData = [
-  {
-    interviewExperienceId: 1,
-    title: "Software Engineer Interview at Google",
-    company: "Google",
-    description: "My experience interviewing for a Software Engineer role at Google.",
-    interviewDate: "2024-06-15",
-    onCampus: true,
-    referral: false,
-    anyTips: "Focus on DSA and system design.",
-    isApproved: true,
-  },
-  {
-    interviewExperienceId: 2,
-    title: "Data Scientist Interview at Facebook",
-    company: "Facebook",
-    description: "Process of getting a Data Scientist role at Facebook.",
-    interviewDate: "2024-07-10",
-    onCampus: false,
-    referral: true,
-    anyTips: "Referrals help a lot! Practice ML algorithms.",
-    isApproved: false,
-  },
-];
+import { getAllInterviewExperiences } from '../apis/InterviewExperienceApi';
 
 const InterviewExp = () => {
   const navigate = useNavigate();
+  const [interviewData, setInterviewData] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      try {
+        const data = await getAllInterviewExperiences();
+        setInterviewData(data.items);
+        setError(null);
+      } catch (error) {
+        console.error('Failed to fetch interview experiences:', error);
+        setError('Failed to load interview experiences. Please try again later.');
+      }
+    };
+    fetchExperiences();
+  }, []);
 
   return (
     <Box
@@ -56,7 +47,11 @@ const InterviewExp = () => {
       >
         Add New Experience
       </Button>
-      <InterviewExperiencesTable data={interviewData} />
+      {error && <Typography color="error">{error}</Typography>}
+      <InterviewExperiencesTable
+        data={interviewData}
+        onDelete={(id) => setInterviewData(interviewData.filter((exp) => exp.interviewExperienceId !== id))}
+      />
     </Box>
   );
 };

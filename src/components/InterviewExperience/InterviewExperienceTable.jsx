@@ -7,6 +7,7 @@ import { Paper, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { deleteInterviewExperience } from '../../apis/InterviewExperienceApi';
 
 const InterviewExperiencesTable = ({ data, onDelete }) => {
   const navigate = useNavigate();
@@ -17,6 +18,15 @@ const InterviewExperiencesTable = ({ data, onDelete }) => {
 
   const handleRowClick = (row) => {
     navigate(`/viewInterviewExperience/${row.original.interviewExperienceId}`);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteInterviewExperience(id);
+      onDelete(id);
+    } catch (error) {
+      console.error('Failed to delete interview experience:', error);
+    }
   };
 
   const columns = useMemo(
@@ -66,7 +76,7 @@ const InterviewExperiencesTable = ({ data, onDelete }) => {
               color="error"
               onClick={(e) => {
                 e.stopPropagation();
-                onDelete(row.original.interviewExperienceId);
+                handleDelete(row.original.interviewExperienceId);
               }}
             >
               <DeleteIcon />

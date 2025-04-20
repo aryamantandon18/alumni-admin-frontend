@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { createNews } from "../../apis/NewsApi";
 
 const validationSchema = Yup.object({
   newsTitle: Yup.string().required("Title is required"),
@@ -40,10 +41,14 @@ export default function AddNewsForm() {
       category: "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      console.log("New News Added:", values);
-      setAddSuccess(true);
-      setTimeout(() => navigate("/news"), 500);
+    onSubmit: async (values) => {
+      try {
+        await createNews(values);
+        setAddSuccess(true);
+        setTimeout(() => navigate("/news"), 500);
+      } catch (error) {
+        console.error("Failed to add news:", error);
+      }
     },
   });
 

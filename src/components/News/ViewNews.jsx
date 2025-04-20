@@ -8,7 +8,7 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
-
+import { getNewsById } from "../../apis/NewsApi";
 
 const ViewNews = ({news}) => {
   const { id } = useParams();
@@ -17,8 +17,15 @@ const ViewNews = ({news}) => {
   const [newsItem, setNewsItem] = useState(null);
 
   useEffect(() => {
-    const foundNews = news.find((n) => n.newsId === numericId);
-    setNewsItem(foundNews || null);
+    const fetchNews = async () => {
+      try {
+        const data = await getNewsById(numericId);
+        setNewsItem(data.item);
+      } catch (error) {
+        console.error("Failed to fetch news:", error);
+      }
+    };
+    fetchNews();
   }, [numericId]);
 
   if (!newsItem) {

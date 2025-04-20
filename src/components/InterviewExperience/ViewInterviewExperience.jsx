@@ -8,6 +8,7 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
+import { getInterviewExperienceById } from '../../apis/InterviewExperienceApi';
 
 // Sample data for interview experiences
 const interviewData = [
@@ -44,11 +45,16 @@ const ViewInterviewExperience = () => {
   const [experience, setExperience] = useState(null);
 
   useEffect(() => {
-    const foundExperience = interviewData.find(
-      (exp) => exp.interviewExperienceId === numericId
-    );
-    setExperience(foundExperience || null);
-  }, [numericId]);
+    const fetchExperience = async () => {
+      try {
+        const data = await getInterviewExperienceById(id);
+        setExperience(data.item);
+      } catch (error) {
+        console.error('Failed to fetch interview experience:', error);
+      }
+    };
+    fetchExperience();
+  }, [id]);
 
   if (!experience) {
     return <Typography variant="h6">Interview Experience not found</Typography>;

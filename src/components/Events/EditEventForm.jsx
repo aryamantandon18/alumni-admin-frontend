@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-
+import { updateEvent } from '../../apis/EventApi';
 
 const validationSchema = Yup.object({
   eventName: Yup.string().required("Event Name is required"),
@@ -35,15 +35,14 @@ const validationSchema = Yup.object({
 export default function EditEventForm({events}) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const numericId = parseInt(id);
 
   const [event, setEvent] = useState(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
   useEffect(() => {
-    const foundEvent = events.find((e) => e.eventId === numericId);
+    const foundEvent = events.find((e) => e.eventId === id);
     setEvent(foundEvent || null);
-  }, [numericId]);
+  }, [id]);
 
   const formik = useFormik({
     initialValues: {
@@ -61,10 +60,14 @@ export default function EditEventForm({events}) {
     },
     enableReinitialize: true,
     validationSchema,
-    onSubmit: (values) => {
-      console.log("Updated Event:", values);
-      setUpdateSuccess(true);
-      setTimeout(() => navigate("/events"), 500);
+    onSubmit: async (values) => {
+      try {
+        await updateEvent(id, values);
+        setUpdateSuccess(true);
+        setTimeout(() => navigate('/events'), 500);
+      } catch (error) {
+        console.error('Failed to update event:', error);
+      }
     },
   });
 

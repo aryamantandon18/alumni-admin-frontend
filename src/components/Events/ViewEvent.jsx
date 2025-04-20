@@ -8,17 +8,24 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
+import { getEventById } from '../../apis/EventApi';
 
 const ViewEvent = ({ events }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const numericId = parseInt(id);
   const [event, setEvent] = useState(null);
 
   useEffect(() => {
-    const foundEvent = events.find((e) => e.eventId === numericId);
-    setEvent(foundEvent || null);
-  }, [numericId]);
+    const fetchEvent = async () => {
+      try {
+        const data = await getEventById(id);
+        setEvent(data.item);
+      } catch (error) {
+        console.error('Failed to fetch event:', error);
+      }
+    };
+    fetchEvent();
+  }, [id]);
 
   if (!event) {
     return <Typography variant="h6">Event not found</Typography>;
